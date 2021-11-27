@@ -3,11 +3,20 @@
  */
 package ex_6_1
 
+import java.lang.RuntimeException
+
 sealed class Option<out A> {
     abstract fun isEmpty(): Boolean
-    fun getOrElse(default: @UnsafeVariance A): A =
+
+    fun <B> map(f: (A) -> B): Option<B> = when (this) {
+        is None -> None
+        is Some -> Some(f(value))
+    }
+
+
+        fun getOrElse(default:()-> @UnsafeVariance A): A =
             when (this){
-                is None -> default
+                is None -> default()
                 is Some -> value
             }
 
@@ -31,6 +40,7 @@ sealed class Option<out A> {
 
 
 fun max(list : List<Int>): Option<Int>  = Option.invoke(list.maxOrNull())
+fun getDefault(): Int = throw RuntimeException()
 
 
 
@@ -44,9 +54,8 @@ class App {
 
 fun main() {
     println(App().greeting)
-    val max1=max(listOf(3,5,7,2,1)).getOrElse(0)
-    val max2=max(listOf()).getOrElse(0)
-
+    val max1=max(listOf(3,5,7,2,1)).getOrElse(::getDefault)
     println(max1)
+    val max2=max(listOf()).getOrElse(::getDefault)
     println(max2)
 }
