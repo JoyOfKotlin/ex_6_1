@@ -31,6 +31,9 @@ sealed class Option<out A> {
     fun orElse(default: () -> Option<@UnsafeVariance A>): Option<A> =
         map {_ -> this }.getOrElse(default)
 
+    fun filter( p: (A)  -> Boolean): Option<A> =
+    flatMap{x-> if(p(x)) this else None}
+
     internal object None: Option<Nothing>() {
         override fun isEmpty()=true
         override fun toString(): String = "None"
@@ -80,7 +83,11 @@ fun main() {
     val resultFlatmapSome=Option(7).flatMap{Option(it*3)}
     println(resultFlatmapSome)
 
-    println("\n")
+   println("\n")
    println(optionTest.orElse { getDefaultOption() })
 
+   println("\n")
+
+   println(optionTest.filter {it>1})
+   println(optionTest.filter {it==1})
 }
