@@ -3,6 +3,7 @@
  */
 package ex_6_1
 
+import org.checkerframework.checker.nullness.Opt
 import java.lang.RuntimeException
 
 sealed class Option<out A> {
@@ -59,6 +60,29 @@ fun getDefaultList(): List<Int> = throw RuntimeException()
 fun <B> getDefaultOption(): Option<B> =
     Option<B>()
 
+val variance: (List<Double>) -> Option<Double> =
+    {
+        list->
+        mean(list).flatMap {
+            m->mean(list.map{x-> Math.pow((x-m),2.0)})
+        }
+    }
+
+
+val mean : (List<Double>) -> Option<Double> =
+    {list ->
+        when{
+            list.isEmpty()->Option()
+            else-> Option(list.sum()/list.size)
+             }
+    }
+
+fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
+    { it.map(f) } //it type Automatically declared based on the expected Type
+
+val upperOption: (Option<String>) -> Option<String> =
+    lift(String::toUpperCase)
+
 
 class App {
     val greeting: String
@@ -67,6 +91,12 @@ class App {
         }
     public fun max() : Int? = null
 }
+
+fun <A> TestAutomaticalyDeclared(a: A): (Option<A>) -> Option<A> = {it}
+
+
+
+
 
 fun main() {
     println(App().greeting)
@@ -90,4 +120,16 @@ fun main() {
 
    println(optionTest.filter {it>1})
    println(optionTest.filter {it==1})
+
+   println("\n")
+   val s1=Option("TestMyString")
+   println(upperOption(s1))
+
+   println("\n")
+   val s="check chek check"
+   val t= TestAutomaticalyDeclared(s)
+    val z=Option("zzzzz")
+    
+   println(z)
+
 }
