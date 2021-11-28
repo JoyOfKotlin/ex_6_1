@@ -28,6 +28,9 @@ sealed class Option<out A> {
             is Some -> value
        }
 
+    fun orElse(default: () -> Option<@UnsafeVariance A>): Option<A> =
+        map {_ -> this }.getOrElse(default)
+
     internal object None: Option<Nothing>() {
         override fun isEmpty()=true
         override fun toString(): String = "None"
@@ -50,6 +53,8 @@ sealed class Option<out A> {
 fun max(list : List<Int>): Option<Int>  = Option.invoke(list.maxOrNull())
 fun getDefaultInt(): Int = throw RuntimeException()
 fun getDefaultList(): List<Int> = throw RuntimeException()
+fun <B> getDefaultOption(): Option<B> =
+    Option<B>()
 
 
 class App {
@@ -68,10 +73,14 @@ fun main() {
 //    val max2=max(listOf()).getOrElse(::getDefault)
 //    println(max2)
 
-    val optionTest=max(listOf())
+    val optionTest=max(listOf(1))
     val resultMap=optionTest.map{ listOf(it,-it)}
     println(resultMap)
 
     val resultFlatmapSome=Option(7).flatMap{Option(it*3)}
     println(resultFlatmapSome)
+
+    println("\n")
+   println(optionTest.orElse { getDefaultOption() })
+
 }
